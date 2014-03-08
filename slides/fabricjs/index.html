@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Fabric.jsを触ってみた</title>
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <link rel="stylesheet" href="../reveal.js-2.6.1/css/reveal.min.css">
+  <link rel="stylesheet" href="../reveal.js-2.6.1/css/theme/moon.css" id="theme">
+
+  <!-- For syntax highlighting -->
+  <link rel="stylesheet" href="../reveal.js-2.6.1/lib/css/zenburn.css">
+
+  <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+  <script>
+    document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+  </script>
+
+  <!--[if lt IE 9]>
+  <script src="../reveal.js-2.6.1/lib/js/html5shiv.js"></script>
+  <![endif]-->
+
+  <script src="fabric.min.js"></script>
+
+</head>
+
+<body>
+<style>
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 { text-transform: none; }
+.reveal cite { font-size: 60%; }
+.reveal .strong { color: red; }
+.reveal .small { font-size: 70%; }
+.reveal .canvas_container {
+  margin: 0 auto 0;
+  width: 100px;
+}
+.reveal canvas {
+  border: 1px solid black;
+}
+</style>
+<script>
+window.addOnload = function(f){
+  if(window.addEventListener) window.addEventListener('load', f, false);
+  else                        window.attachEvent('onload', f);
+}
+</script>
+
+<div class="reveal">
+<div class="slides">
+
+<section>
+  <h2>Fabric.jsを触ってみた</h2>
+</section>
+
+<section>
+  <h2>自己紹介</h2>
+  <ul>
+    <li>@bati11_</li>
+    <li>バックエンドシステムの開発・運用のお仕事してます</li>
+    <li>仕事で使ってる言語は<br>Java 60%, Ruby 20%, PHP 15%, Scala 5%, JavaScript 0%</li>
+    <li>でも、JavaScript好きです</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Fabric.jsとは</h2>
+  <p>Canvas APIを使いやすくしてくれるJavaScriptライブラリ</p>
+</section>
+
+<section>
+  <h2>Canvasに四角形を描く</h2>
+  <h3>Canvas API</h3>
+  <pre><code trim-data class="javascript">
+    var canvasEl = document.getElementById('c');
+    var ctx = canvasEl.getContext('2d');
+    ctx.fillStyle = 'red';
+    ctx.fillRect(10, 10, 20, 20);
+  </code></pre>
+  <iframe src="sample1.html" width="200px" height="200px" ></iframe>
+</section>
+
+<section>
+  <h2>Canvasに四角形を描く</h2>
+  <h3>Fabric.js</h3>
+  <pre><code trim-data class="javascript">
+    var canvas = new fabric.Canvas('c');
+    var rect = new fabric.Rect({
+      left: 10,
+      top: 10,
+      fill: 'red',
+      width: 20,
+      height: 20
+    });
+    canvas.add(rect);
+  </code></pre>
+  <iframe src="sample2.html" width="200px" height="200px" ></iframe>
+</section>
+
+<section>
+  <h2>2つの四角形を描く</h2>
+  <h3>Canvas API</h3>
+  <pre><code trim-data class="javascript">
+    var canvasEl = document.getElementById('c');
+    var ctx = canvasEl.getContext('2d');
+    ctx.fillStyle = 'red';
+    ctx.fillRect(10, 10, 20, 20);
+    ctx.fillStyle = 'blue';
+    ctx.fillRect(30, 30, 20, 20);
+  </code></pre>
+  <iframe src="sample3.html" width="200px" height="200px" ></iframe>
+</section>
+
+<section>
+  <h2>2つの四角形を描く</h2>
+  <h3>Fabric.js</h3>
+  <pre><code trim-data class="javascript">
+    var canvas = new fabric.Canvas('c');
+    var redRect = new fabric.Rect({
+      left: 10, top: 10, fill: 'red', width: 20, height: 20
+    });
+    var blueRect = new fabric.Rect({
+      left: 30, top: 30, fill: 'blue', width: 20, height: 20
+    });
+    canvas.add(redRect);
+    canvas.add(blueRect);
+  </code></pre>
+  <iframe src="sample4.html" width="200px" height="200px" ></iframe>
+</section>
+
+<section>
+  <h2>四角形の位置を変える</h2>
+  <h3>Canvas API</h3>
+  <pre><code trim-data class="javascript">
+    var canvasEl = document.getElementById('c');
+    var ctx = canvasEl.getContext('2d');
+    ctx.fillStyle = 'red';
+    ctx.fillRect(10, 10, 20, 20);
+
+    function move() {
+      ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+      ctx.fillRect(40, 40, 20, 20);
+    }
+    documents.getElementById('button').addEventListener('click', move);
+  </code></pre>
+  <iframe src="sample5.html" width="200px" height="200px" ></iframe>
+</section>
+
+<section>
+  <h2>四角形の位置を変える</h2>
+  <h3>Fabric.js</h3>
+  <pre><code trim-data class="javascript">
+    var canvas = new fabric.Canvas('c');
+    var rect = new fabric.Rect({
+      left: 10, top: 10, fill: 'red', width: 20, height: 20
+    });
+    canvas.add(rect);
+
+    function move() {
+      rect.set({left: 40, top: 40});
+      canvas.renderAll();
+    }
+    documents.getElementById('button').addEventListener('click', move);
+  </code></pre>
+  <iframe src="sample6.html" width="200px" height="200px" ></iframe>
+</section>
+
+<section>
+  <h2>違いは...</h2>
+  <h3>Canvas API</h3>
+  <ul><li>canvas全体を1つのオブジェクトとして操作する感じ</li></ul>
+  <br>
+  <br>
+  <h3>Fabric.js</h3>
+  <ul><li>canvasに描く図形をそれぞれ1つのオブジェクトとして操作する感じ</li></ul>
+</section>
+
+<section>
+  <h3>さらに...</h3>
+  <ul>
+    <li>インタラクティブ<br>描画した図形をマウスでグリグリ動かすこともできる</li>
+  </ul>
+  <iframe src="sample7.html" width="400px" height="400px" ></iframe>
+</section>
+
+<section>
+  <h3>Fabric.jsで描画できる図形</h3>
+  <ul>
+    <li>Circle</li>
+    <li>Ellipse</li>
+    <li>Line</li>
+    <li>Polygon</li>
+    <li>Polyline</li>
+    <li>Rect</li>
+    <li>Triangle</li>
+    <li>Path（※ SVGのpathと同じような）</li>
+  </ul>
+  <iframe src="sample8.html" width="700px" height="150px" ></iframe>
+</section>
+
+<section>
+  <h2>他にも...</h2>
+</section>
+
+<section>
+  <h2>画像</h2>
+  <p>画像も図形と同じように扱える。</p>
+  <pre><code trim-data class="javascript">
+    var canvas = new fabric.Canvas('c');
+    fabric.Image.fromURL('user.png', function(img) {
+      img.set({left: 20, top: 20});
+      canvas.add(img);
+    });
+    fabric.Image.fromURL('computer.png', function(img) {
+      img.set({left: 120, top: 40});
+      img.filters.push(
+        new fabric.Image.filters.Grayscale(),
+        new fabric.Image.filters.Brightness({ brightness: 10 })
+      );
+      img.applyFilters(canvas.renderAll.bind(canvas));
+      canvas.add(img);
+    });
+  </code></pre>
+  <iframe src="sample9.html" width="300px" height="150px" ></iframe>
+</section>
+
+<section>
+  <h2>テキスト</h2>
+  <p>テキストも図形と同じように扱える。</p>
+  <pre><code trim-data class="javascript">
+    var canvas = new fabric.Canvas('c');
+    canvas.add(new fabric.Text("jsCafe", {
+      left: 0, top: 0,
+      fill: '#5fcc28',
+      fontSize: 30
+    }));
+    canvas.add(new fabric.Text("jsCafe", {
+      left: 150, top: 0,
+      fill: '#fff',
+      stroke: 'blue',
+      strokeWidth: 2,
+      fontFamily: 'sans-serif',
+      fontSize: 50
+    }));
+    canvas.add(new fabric.Text("jsCafe", {
+      left: 400, top: 0,
+      fill: '#fff',
+      fontSize: 30,
+      angle: 20,
+      textDecoration: 'underline'
+    }));
+  </code></pre>
+  <iframe src="sample10.html" width="800px" height="150px" ></iframe>
+</section>
+
+<section>
+  <h2>アニメーション</h2>
+  <p>絶対値だけでなく、相対値による指定もできる</p>
+  <pre><code trim-data class="javascript">
+    var canvas = new fabric.Canvas('c');
+    var redRect = new fabric.Rect({ left: 10, top: 10, fill: 'red', width: 20, height: 20 });
+    var blueRect = new fabric.Rect({ left: 30, top: 30, fill: 'blue', width: 20, height: 20 });
+    canvas.add(redRect);
+    canvas.add(blueRect);
+
+    function move() {
+      // 絶対値で指定
+      redRect.animate('left', 70, {
+        onChange: canvas.renderAll.bind(canvas)
+      });
+      // 相対値で指定
+      blueRect.animate('left', '+=30', {
+        onChange: canvas.renderAll.bind(canvas),
+        easing: fabric.util.ease.easeOutBounce
+      });
+    }
+    document.getElementById('button').addEventListener('click', move);
+  </code></pre>
+  <iframe src="sample11.html" width="200px" height="200px" ></iframe>
+</section>
+
+<section>
+  <h2>グループ化</h2>
+  <p>複数の図形を、1つの図形としてマウスで動かせる</p>
+  <pre><code trim-data class="javascript">
+    var canvas = new fabric.Canvas('c');
+    var ellipse = new fabric.Ellipse({
+      fill: '#f09cdb', rx: 160, ry: 40
+    });
+    var text = new fabric.Text("jsCafe", {
+      left: 80, top: 20
+    });
+
+    var group = new fabric.Group([ellipse, text], {
+      left: 10,
+      top: 10
+    });
+    canvas.add(group);
+  </code></pre>
+  <iframe src="sample12.html" width="600px" height="150px" ></iframe>
+</section>
+
+<section>
+  <h2>イベント</h2>
+  <p>図形の追加時、選択時、選択解除時、などイベントが発生</p>
+  <pre><code trim-data class="javascript">
+    var canvas = new fabric.Canvas('c');
+    canvas.on('object:selected', function(options) {
+      alert(options.target.fill);
+    });
+    canvas.on('selection:cleared', function(options) {
+      alert('cleared!');
+    });
+
+    var rect = new fabric.Rect({
+      left: 10, top: 10, fill: 'red', width: 20, height: 20
+    });
+    canvas.add(rect);
+  </code></pre>
+  <iframe src="sample13.html" width="200px" height="150px" ></iframe>
+</section>
+
+<section>
+  <h2>エクスポート</h2>
+  <p>Json、SVGでエクスポート。逆にインポートすることも。</p>
+  <pre><code trim-data class="javascript">
+    var canvas = new fabric.Canvas('c');
+    var rect = new fabric.Rect({
+      left: 10, top: 10, fill: 'red', width: 20, height: 20
+    });
+    canvas.add(rect);
+
+    function toSVG() {
+      alert(canvas.toSVG());
+    }
+    document.getElementById('button').addEventListener('click', toSVG);
+  </code></pre>
+  <iframe src="sample14.html" width="200px" height="180px" ></iframe>
+</section>
+
+<section>
+  <h2>使ってみた</h2>
+  <ul>
+    <li>そもそもCanvasってどういうときに使うんだろう・・・</li>
+    <li>Flappy Birdを真似てゲームを作ってみた<span class="small">&nbsp;=&gt;<a href="http://bati11.github.io/flappy-ball/app/" target="_blank">Flappy Ball</a></span></li>
+    <li>他にもCacooの超超超劣化版みたいなの作り始めてみた</li>
+    <li>素のCanvasAPIを使うよりコードが見やすい。インタラクティブな操作が必要な場合でもとても簡単。コーディング楽しかった。</li>
+    <li>昨今流行りのMV＊フレームワークと一緒に使おうとした<span class="small" >（データマッピングしたい欲求が出てきた）</span></li>
+    <li>どうやって一緒に使ったらいいのか分からなかった<span class="small" >（MV＊フレームワーク使いこなせてない...）</span></li>
+    <li>CanvasとかSVGとかのライブラリとMV＊フレームワークってどうやって一緒に使えばいいんだろう・・・？</li>
+    <li>Backboneは独自のモデルを作る必要があるので、もしかして相性悪い・・・？</li>
+  </ul>
+</section>
+
+<section>
+  <h2>おしまい</h2>
+</section>
+
+</div>
+</div>
+
+<script src="../reveal.js-2.6.1/lib/js/head.min.js"></script>
+<script src="../reveal.js-2.6.1/js/reveal.min.js"></script>
+
+<script>
+
+  // Full list of configuration options available here:
+  // https://github.com/hakimel/reveal.js#configuration
+  Reveal.initialize({
+    controls: true,
+    progress: true,
+    history: true,
+    center: true,
+
+    theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+    transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+
+    // Optional libraries used to extend on reveal.js
+    dependencies: [
+      { src: '../reveal.js-2.6.1/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: '../reveal.js-2.6.1/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: '../reveal.js-2.6.1/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: '../reveal.js-2.6.1/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js-2.6.1/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: '../reveal.js-2.6.1/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+    ]
+  });
+
+</script>
+
+</body>
+</html>

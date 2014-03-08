@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <script src="fabric.min.js"></script>
+<style>
+canvas {
+  border: 1px solid black;
+}
+</style>
+</head>
+<body>
+  <canvas id="c" width="400" height="100" />
+  <script>
+  (function(){
+    var canvas = new fabric.Canvas('c');
+    var ellipse = new fabric.Ellipse({
+      fill: '#f09cdb',
+      rx: 160,
+      ry: 40
+    });
+    var text = new fabric.Text("jsCafe", {
+      left: 80,
+      top: 20
+    });
+    var group = new fabric.Group([ellipse, text], {
+      left: 10,
+      top: 10
+    });
+    canvas.add(group);
+  }());
+  </script>
+</body>
+</html>
+
+
+

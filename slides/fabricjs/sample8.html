@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <script src="fabric.min.js"></script>
+<style>
+canvas {
+  border: 1px solid black;
+}
+</style>
+</head>
+<body>
+  <canvas id="c" width="500" height="100" />
+  <script>
+  (function(){
+    var canvas = new fabric.Canvas('c');
+    var circle = new fabric.Circle({
+      left: 10,
+      top: 10,
+      fill: '#7acc28',
+      radius: 10
+    });
+    var ellipse = new fabric.Ellipse({
+      left: 50,
+      top: 10,
+      fill: '#28a3cc',
+      rx: 20,
+      ry: 10
+    });
+    var line = new fabric.Line([120, 10, 140, 50], {
+      stroke: '#cf94cf',
+      strokeWidth: 5
+    });
+    var polygon = new fabric.Polygon([
+      {x: 190, y: 10},
+      {x: 200, y: 10},
+      {x: 190, y: 80},
+      {x: 210, y: 90}
+    ], {
+      left: 190,
+      top: 10,
+      fill: '#28cccc',
+      stroke: '#5128cc',
+      strokeWidth: 2
+    });
+    var polyline = new fabric.Polyline([
+      {x: 270, y: 10},
+      {x: 280, y: 10},
+      {x: 270, y: 80},
+      {x: 290, y: 90}
+    ], {
+      left: 270,
+      top: 10,
+      fill: '#ddc3ca',
+      stroke: '#cc2851',
+      strokeWidth: 2
+    });
+    var rect = new fabric.Rect({
+      left: 350,
+      top: 10,
+      fill: '#28cca3',
+      width: 20,
+      height: 20
+    });
+    var triangle = new fabric.Triangle({
+      left: 420,
+      top: 10,
+      fill: '#cc28cc',
+      width: 20,
+      height: 20
+    });
+    var path = new fabric.Path('M 0 0 Q 0 50 20 50 L 30 50 z', {
+      left: 440,
+      top: 10,
+      fill: '#28cccc'
+    });
+    canvas.add(circle);
+    canvas.add(ellipse);
+    canvas.add(line);
+    canvas.add(polygon);
+    canvas.add(polyline);
+    canvas.add(rect);
+    canvas.add(triangle);
+    canvas.add(path);
+  }());
+  </script>
+</body>
+</html>
+
