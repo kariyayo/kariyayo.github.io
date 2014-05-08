@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Gradleを使えるようになるために</title>
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <link rel="stylesheet" href="css/reveal.min.css">
+  <link rel="stylesheet" href="css/theme/moon.css" id="theme">
+
+  <!-- For syntax highlighting -->
+  <link rel="stylesheet" href="lib/css/zenburn.css">
+
+  <!-- If the query includes 'print-pdf', use the PDF print sheet -->
+  <script>
+    document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+  </script>
+
+  <!--[if lt IE 9]>
+  <script src="lib/js/html5shiv.js"></script>
+  <![endif]-->
+
+</head>
+
+<body>
+<style>
+.reveal h2,
+.reveal h3,
+.reveal h4,
+.reveal h5,
+.reveal h6 { text-transform: none; }
+.reveal cite { font-size: 60%; }
+.reveal .strong { color: red; }
+.reveal .small { font-size: 70%; }
+.reveal .accent { color: #eee8d5; }
+.reveal pre { background: #3F3F3F; color: #DCDCDC }
+</style>
+
+<div class="reveal">
+<div class="slides">
+<section data-markdown data-separator="^\n\n\n---\n\n\n$" data-vertical="^\n\n\n--\n\n$">
+<script type="text/template">
+
+## Gradleを使えるように
+## なるために
+
+
+
+---
+
+
+
+### 目次
+
+ * Gradleとは
+ * とりあえず動かす
+ * Gradleを使えるようになるためにはどうすれば？
+ * 超シンプルな例
+ * 超シンプルな例を詳しく見てみる
+ * Androidアプリプロジェクトのビルドスクリプト
+ * まとめ
+
+
+
+---
+
+
+
+### Gradleとは
+
+ * JVMで動くビルドツール
+ * ビルドスクリプトをGroovyで書く
+ * ライブラリの依存関係管理もできる
+ * Springなど、Javaのプロダクトのビルドで使われている
+ * Androidアプリのビルドにも使われる（今後標準になる？）
+
+
+
+---
+
+
+
+### Gradleを使えるようになるには
+### どうすれば？
+
+ * ドキュメントを読もう！
+   * [ユーザーガイド](http://gradle.monochromeroad.com/docs/userguide/userguide.html)
+   * [DSLリファレンス](http://gradle.monochromeroad.com/docs/dsl/index.html)
+   * gradle-&lt;version&gt;-all.zipをDLすると手に入るサンプル
+ * でも何も分からない状態だとちょっと読みづらい・・・
+ * 読むための知識を身につけよう！
+
+
+
+---
+
+
+
+### とりあえず動かす
+
+Gradleをダウンロードしてパスを通して実行してみる
+<pre>
+$ gradle
+:help
+
+Welcome to Gradle 1.12.
+
+To run a build, run gradle <task> ...
+
+To see a list of available tasks, run gradle tasks
+
+To see a list of command-line options, run gradle --help
+
+BUILD SUCCESSFUL
+
+Total time: 2.464 secs
+</pre>
+
+
+
+---
+
+
+
+ビルドスクリプトはbuild.gradleにGroovyで書く
+
+```java
+// build.gradle
+println("hogehoge")
+```
+
+build.gradleと同じディレクトリで実行してみる
+
+<pre>
+$ gradle
+hogehoge
+
+Welcome to Gradle 1.12.
+
+To run a build, run gradle <task> ...
+
+To see a list of available tasks, run gradle tasks
+
+To see a list of command-line options, run gradle --help
+
+BUILD SUCCESSFUL
+
+Total time: 2.464 secs
+</pre>
+
+build.gradleに記述した通り"hogehoge"が出力されてる！
+
+
+
+---
+
+
+
+実際は、実行したい処理は **タスク** として記述する
+
+```java
+// build.gradle
+task hoge << {
+    println("hogehoge")
+}
+```
+
+gradle &lt;task name&gt; でタスクを実行する
+
+<pre>
+$ gradle hoge
+:hoge
+hogehoge
+
+BUILD SUCCESSFUL
+
+Total time: 2.694 secs
+</pre>
+
+-qオプションをつけるとタスクの出力のみを表示する
+
+<pre>
+$ gradle -q hoge
+hogehoge
+</pre>
+
+
+
+---
+
+
+
+タスク一覧を表示。hoge以外にも最初からいくつかある
+
+<pre>
+$ gradle -q tasks
+
+------------------------------------------------------------
+All tasks runnable from root project
+------------------------------------------------------------
+
+Build Setup tasks
+-----------------
+init - Initializes a new Gradle build. [incubating]
+wrapper - Generates Gradle wrapper files. [incubating]
+
+Help tasks
+----------
+dependencies - Displays all dependencies declared in root project 'fuga'.
+dependencyInsight - Displays the insight into a specific dependency in root project 'fuga'.
+help - Displays a help message
+projects - Displays the sub-projects of root project 'fuga'.
+properties - Displays the properties of root project 'fuga'.
+tasks - Displays the tasks runnable from root project 'fuga'.
+
+Other tasks
+-----------
+hoge
+
+To see all tasks and more detail, run with --all.
+</pre>
+
+
+
+---
+
+
+
+タスク同士は依存関係を持つことができる
+
+```java
+// build.gradle
+task hoge << {
+    println("hogehoge")
+}
+
+task fuga(dependsOn: "hoge") << {
+    println("fugafuga")
+}
+```
+
+fugaタスクはhogeタスクに依存している  
+fugaタスクを実行すると、先にhogeタスクが実行される
+
+<pre>
+$ gradle -q fuga
+hogehoge
+fugafuga
+</pre>
+
+
+
+---
+
+
+
+tasksタスクの--allオプション  
+タスクの依存関係も表示してくれる
+
+<pre>
+$ gradle -q tasks --all
+
+・・・
+
+Other tasks
+-----------
+fuga
+    hoge
+</pre>
+
+
+
+---
+
+
+
+### ちょっとまとめ
+
+ * build.gradleにビルドスクリプトを書く
+ * 処理はタスクという単位で書いたり実行したりする
+ * tasksタスクで（gradle tasks）実行できるタスクを確認できる
+ * -qオプションでタスクの出力以外を表示しない
+ * タスク同士は依存関係を持てる
+ * gradle tasks --all で依存関係を確認できる
+
+
+
+---
+
+
+
+### 超シンプルな例
+
+ * 下記はJavaをビルドするためのビルドスクリプト
+ * Groovyでスクリプトを書いていくと言うよりDSLを使って設定を記述していくような感じ
+
+```java
+// build.gradle
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'joda-time:joda-time:2.3'
+}
+```
+
+
+
+---
+
+
+
+プラグインの設定
+
+```java
+apply plugin: 'java'
+```
+
+ * プラグインによってタスクや設定項目が増える
+ * ユーザーガイド =&gt; [Javaプラグイン](http://gradle.monochromeroad.com/docs/userguide/java_plugin.html)
+ * JavaプラグインでJavaをビルドするタスクが増える
+
+<pre>
+$ gradle -q tasks
+
+Build tasks
+-----------
+assemble - Assembles the outputs of this project.
+build - Assembles and tests this project.
+buildDependents - Assembles and tests this project and all projects that depend on it.
+buildNeeded - Assembles and tests this project and all projects it depends on.
+classes - Assembles classes 'main'.
+clean - Deletes the build directory.
+jar - Assembles a jar archive containing the main classes.
+testClasses - Assembles classes 'test'.
+
+# 他にもいろいろ...
+
+</pre>
+
+
+
+---
+
+
+
+ディレクトリ構成
+
+ * Javaプラグインを使うとき、以下のようなディレクトリ構成になっていることが想定されている
+ * カスタマイズは可能
+ * ユーザーガイド =&gt; [Javaクイックスタート](http://gradle.monochromeroad.com/docs/userguide/tutorial_java_projects.html)
+
+<pre>
+&lt;PROJECT_HOME&gt;
+├── build.gradle
+└── src
+    ├── main
+    │   ├── java
+    │   │   └── myapp
+    │   │       └── Main.java
+    │   └── resources
+    └── test
+        ├── java
+        └── resources
+</pre>
+
+
+
+---
+
+
+
+ライブラリの依存関係管理
+```java
+// build.gradle
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'joda-time:joda-time:2.3'
+}
+```
+
+ * repositories
+   * ライブラリをダウンロードしてくるMavenリポジトリを指定する
+ * dependencies
+   * プロジェクトで使用するライブラリを指定する
+ * ユーザーガイド =&gt; [依存関係管理の基本](http://gradle.monochromeroad.com/docs/userguide/artifact_dependencies_tutorial.html)
+
+
+
+---
+
+
+
+### ちょっとまとめ
+
+ * build.scriptには、Groovyでごりごり実装していくのではなくDSLを使って設定を記述していく感じ
+ * プラグインを使ってタスクを追加できる
+ * プラグインで何ができるかはユーザーガイドで調べることができる
+ * GradleでJavaをビルドする場合は、デフォルトで想定されるディレクトリ構成がある
+ * Mavenリポジトリを使ったライブラリの依存関係管理ができる
+
+
+
+---
+
+
+
+### 超シンプルな例を詳しく見てみる
+applyは何者？
+
+```java
+// build.gradle
+apply plugin: 'java'
+```
+
+ * Projectオブジェクトのapply()メソッド
+ * build.gradleではProjectオブジェクトのメソッドが呼べる
+ * DSLリファレンスで他のメソッドも分かる -&gt; [Project](http://gradle.monochromeroad.com/docs/dsl/org.gradle.api.Project.html)
+ * ただのメソッド呼び出しがGroovyのおかげで設定項目のように見える
+   * メソッド呼び出しの()を省略できる
+   * メソッドの最後の引数がMapであるとき、名前付き引数のように指定できる
+
+
+
+---
+
+
+
+repositoriesとdependenciesもProjectのメソッド
+
+```java
+// build.gradle
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'joda-time:joda-time:2.3'
+}
+```
+
+ * クロージャを引数として受け取るメソッド
+ * DSLリファレンスに「スクリプトブロック」として書かれている
+ * クロージャとはJavaScriptの無名関数のようなもの
+
+<pre>
+repositories {
+    mavenCentral()
+}
+</pre>
+
+<pre>
+repositories(function(){
+    mavenCentral()
+});
+</pre>
+
+
+
+---
+
+
+
+じゃあmavenCentral()もProjectのメソッド？
+
+```java
+// build.gradle
+repositories {
+    mavenCentral()
+}
+```
+
+ * 違う
+ * リファレンスを見てもProjectにmavenCentral()はない
+ * じゃあ、誰のメソッドを呼び出しているのか？
+
+
+
+---
+
+
+
+DSLリファレンスで  
+repositoriesスクリプトブロックを調べる
+
+> "The RepositoryHandler is passed to the closure as the closure's delegate."
+> 
+> Delegates to:
+>   RepositoryHandler from repositories
+
+<cite>[&nbsp;引用&nbsp;]&nbsp;[Gradleビルド言語リファレンス](http://gradle.monochromeroad.com/docs/dsl/org.gradle.api.Project.html#org.gradle.api.Project:repositories%28groovy%2elang%2eClosure%29)</cite>
+
+ * クロージャ内からRepositoryHandlerにアクセスできる
+ * mavenCentral()メソッドは、RepositoryHandlerオブジェクトのメソッド
+ * DSLリファレンス -&gt; [RepositoryHandler](http://gradle.monochromeroad.com/docs/dsl/org.gradle.api.artifacts.dsl.RepositoryHandler.html)
+
+
+
+---
+
+
+
+なぜクロージャ内からRepositoryHandlerの  
+メソッドを呼べるのか？
+
+ * クロージャの暗黙的引数であるdelegateを利用している
+ * delegate変数にRepositoryHandlerオブジェクトが渡される
+ * "delegate"を省略してメソッド名のみで呼ぶことができる（thisのように省略できる）。つまり、以下の2つは同じ
+
+```java
+repositories {
+    mavenCentral()
+}
+```
+
+```java
+repositories {
+    delegate.mavenCentral()
+}
+```
+
+
+
+---
+
+
+
+### ちょっとまとめ
+
+ * build.gradleではProjectのメソッドが呼べる
+   * DSLリファレンスでProjectを調べれば、build.gradleに何を書けるのか分かる
+ * メソッドの中にはクロージャを渡せるものがあり、スクリプトブロックとなる
+ * ブロック内（クロージャ）では、Project以外のオブジェクトのメソッドも呼べる
+   * ブロック内から参照できるオブジェクトはDSLリファレンスの「Deletes to:」を見ると分かる
+
+
+
+---
+
+
+
+### Androidアプリプロジェクトの
+### ビルドスクリプト
+
+Android Studioで作成したプロジェクトを見てみよう！
+
+
+
+---
+
+
+
+Gradle関連のファイルをピックアップ
+<pre>
+&lt;PROJECT_HOME&gt;
+  |- build.gradle
+  |- gradle/
+  |   `- wrapper/
+  |      |- gradle-wrapper.jar
+  |      `- gradle-wrapper.properties
+  |- gradlew
+  |- gradlew.bat
+  |- settings.gradle
+  |
+  `- app/
+      `- build.gradle
+</pre>
+
+
+
+---
+
+
+
+gradlew, gradlew.bat, gradle/
+
+ * Gradleラッパーという仕組みがある
+ * ユーザーガイド =&gt; [Gradleラッパー](http://gradle.monochromeroad.com/docs/userguide/gradle_wrapper.html)
+ * gradlewコマンドを実行するとgradle-wrapper.propertiesに書いてあるバージョンのGradleをダウンロードして使ってくれる
+ * 各環境にあるgradleコマンドを使うのではなく、プロジェクト上のgradlewを使うことで環境依存を減らせる
+
+<pre>
+&lt;PROJECT_HOME&gt;
+  |- gradle/
+  |   `- wrapper/
+  |      |- gradle-wrapper.jar
+  |      `- gradle-wrapper.properties
+  |- gradlew
+  `- gradlew.bat
+</pre>
+
+
+
+---
+
+
+
+build.gradle
+
+ * ビルドスクリプトを記述するファイル
+ * ビルドスクリプトが2つあるのはなぜ？
+
+<pre>
+&lt;PROJECT_HOME&gt;
+  |- build.gradle
+  |- settings.gradle
+  `- app/
+      `- build.gradle
+</pre>
+
+
+
+---
+
+
+
+マルチプロジェクト
+
+ * Gradleはサブプロジェクトを持つ階層型のプロジェクト構成を定義できる
+ * Androidではマルチプロジェクト構成となっている
+ * Android開発ではライブラリプロジェクトをサブプロジェクトとして追加していくことができる
+ * ユーザーガイド =&gt; [マルチプロジェクトのJavaビルド](http://gradle.monochromeroad.com/docs/userguide/tutorial_java_projects.html#sec:examples)
+
+
+
+---
+
+
+
+settings.gradle
+
+ * マルチプロジェクト構成におけるサブプロジェクトを定義する
+
+<pre>
+&lt;PROJECT_HOME&gt;
+  |- build.gradle
+  |- settings.gradle
+  `- app/
+      `- build.gradle
+</pre>
+
+
+
+---
+
+
+
+settings.gradleの中身
+
+```java
+// settings.gradle
+include ':app'
+```
+
+includeは何者？
+
+ * Settingsオブジェクトのinclude()メソッド
+ * settings.gradleではSettingsオブジェクトのメソッドが呼べる
+ * DSLリファレンス -&gt; [Settings](http://gradle.monochromeroad.com/docs/dsl/org.gradle.api.initialization.Settings.html)
+
+
+
+---
+
+
+
+build.gradle
+
+中身を見てみよう！もう調べられるはず！
+
+<pre>
+&lt;PROJECT_HOME&gt;
+  |- build.gradle
+  |- settings.gradle
+  `- app/
+      `- build.gradle
+</pre>
+
+
+
+---
+
+
+
+### ちょっとまとめ
+
+ * Gradleラッパーで環境によらず同じバージョンのGradleを使える
+ * Gradleではマルチプロジェクト構成にできる
+   * サブプロジェクトはsettings.gradleで定義
+   * settings.gradleではSettingsのメソッドが呼べる
+ * Androidアプリ開発ではマルチプロジェクト構成になる
+
+
+
+---
+
+
+
+### 全体のまとめ
+
+ * Gradleでは色々できる
+ * 何ができるかはドキュメントを読むと分かる
+ * だけど何も知らないとドキュメントは読みづらい
+ * 以下の点を知っておくと読みやすくなると思う
+   * Gradleにはおおまかにどんな機能があるか
+   * build.gradleに記述できる内容をどうやって調べるか
+
+
+
+---
+
+
+
+ * 今日出てきたGradleの機能たち
+   * タスク
+   * プラグイン
+   * ライブラリの依存関係の管理
+   * マルチプロジェクト
+   * Gradleラッパー
+ * [ユーザーガイド](http://gradle.monochromeroad.com/docs/userguide/userguide.html)を見ると各機能について調べられる
+ * 標準的な各種プラグインで何ができるかもユーザーガイドを見れば分かる
+
+
+
+---
+
+
+
+ * build.scriptではProjectのメソッドが呼べる
+ * [DSLリファレンス](http://gradle.monochromeroad.com/docs/dsl/index.html)でProjectを調べることでbuild.scriptに何を書けるか分かる
+ * スクリプトブロック内では、delegateされたオブジェクトのメソッドも呼べる
+   * 何がdelegateされたのかはDSLリファレンスの各スクリプトブロックの「Delegates to:」を見れば分かる
+   * クロージャのdelegate変数で実現してる
+ * マルチプロジェクト構成ではsettings.gradleも必要になる
+   * settings.gradleではSettingsのメソッドが呼べる
+
+
+
+---
+
+
+
+ * ドキュメントを読もう！
+   * [ユーザーガイド](http://gradle.monochromeroad.com/docs/userguide/userguide.html)
+   * [DSLリファレンス](http://gradle.monochromeroad.com/docs/dsl/index.html)
+   * gradle-&lt;version&gt;-all.zipをDLすると手に入るサンプル
+
+
+
+---
+
+
+
+### おしまい
+
+
+
+</script>
+</section>
+</div>
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
+
+<script>
+
+  // Full list of configuration options available here:
+  // https://github.com/hakimel/reveal.js#configuration
+  Reveal.initialize({
+    history: true,
+
+    transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+    transitionSpeed: 'default', // default/fast/slow
+    backgroundTransition: 'default', // default/none/slide/concave/convex/zoom
+
+    theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+
+    // Optional libraries used to extend on reveal.js
+    dependencies: [
+      { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+    ]
+  });
+
+</script>
+
+</body>
+</html>
